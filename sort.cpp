@@ -3,25 +3,39 @@
 #include <string>
 #include <sstream>
 #include <iterator>
-#include <boost/algorithm/string.hpp>
 #include <algorithm>
 #include <fstream>
 using namespace std;
 
 std::vector<int> col_ord;
 
-bool sortcol(const vector<int>& v1, const vector<int>& v2) 
+bool sortcol(const vector<string>& v1, const vector<string>& v2) 
 {
-	return v1[1] > v2[1];
+	for(int i=0;i<col_ord.size(); i++)
+	{
+		if(v1[col_ord[i]] != v2[col_ord[i]])
+		{
+			return v1[col_ord[i]] < v2[col_ord[i]];
+		}
+	}
+	return 1;
 }
 
 int main(int argc, char const *argv[])
 {
 	int mem_size = atoi(argv[3])*1000;
 	int tup_size = 100;
-	int n_cols = 6 - argc;
+	int n_cols = argc - 6 + 1;
 	int col_sizes[3] = {10,32,52};
 
+	// cout << argc << endl;
+
+	//Get column sort order
+	for(int i=0;i<n_cols;i++)
+	{
+		int j = int(argv[5+i][1] - '0');
+		col_ord.push_back(j);
+	}
 	//Get number of tuples that fit
 	int num = mem_size/tup_size;
 
@@ -35,8 +49,6 @@ int main(int argc, char const *argv[])
 		while(getline(file, line))
 		{
 			std::vector<string> v;
-			// boost::split(v , line, boost::is_any_of(" "));
-			// stringVec.push_back(v);
 			int j=0;
 			for(int i=0;i<3;i++)
 			{
@@ -44,11 +56,16 @@ int main(int argc, char const *argv[])
 				j+=col_sizes[i]+2;
 			}
 			stringVec.push_back(v);
-			cout << v[2] << endl;
+			// cout << v[2] << endl;
 		}
 	}
 
 	//sort them
+
+	sort(stringVec.begin(), stringVec.end(), sortcol);
+
+	for(int i=0;i<stringVec.size();i++)
+		cout << stringVec[i][0] << endl;
 
 	//put them in a file
 
